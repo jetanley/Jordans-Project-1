@@ -1,0 +1,12 @@
+---
+title: "Interacting with APIs"
+author: "Jordan Tanley"
+date: "6/8/2022"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+rmarkdown::render("README.Rmd", output_format = "github_document", output_options = list(html_preview = FALSE))
