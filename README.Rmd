@@ -1,0 +1,13 @@
+---
+title: "Project 1"
+author: "Jordan Tanley"
+date: "6/8/2022"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+
