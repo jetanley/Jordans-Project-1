@@ -8,6 +8,52 @@ date: "6/8/2022"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(fig.path = "~/images/")
+```
 
 
+## Packages
+
+```{r, message=FALSE}
+library(tidyverse)
+library(dplyr)
+library(httr)
+library(jsonlite)
+```
+
+
+## API Functions
+
+```{r}
+movies <- GET("https://pokeapi.co/api/v2/pokemon")
+```
+
+```{r}
+str(movies, max.level = 1)
+movies$headers
+# grab the list element we want and convert it to character and and convert to 
+parsed <- fromJSON(rawToChar(movies$content))
+# look at list - we want articles
+str(parsed, max.level = 1)
+str(parsed$abilities)
+# variable names within articles
+parsed$results %>% colnames()
+# save as r object
+applenews <- parsed$abilities
+# print tibble of first 3 variables
+as_tibble(applenews)
+```
+
+
+## Exploratory Data Analysis
+
+### Data
+
+### Tables
+
+### Numerical Summaries
+
+### Graphical Summaries 
 
