@@ -8,6 +8,8 @@ Jordan Tanley
 The required packages to use the following functions and summary
 statistics are as follows.
 
+-   [`knitr`](https://yihui.org/knitr/): Used for knitting the
+    document  
 -   [`tidyverse`](https://www.tidyverse.org/): Used for data handling  
 -   [`dplyr`](https://dplyr.tidyverse.org/): Helpful for data
     manipulation  
