@@ -424,7 +424,7 @@ g <- ggplot(data = pokedex, aes(x = shape, fill = as.factor(types)))
 g + geom_bar()   + labs(x = "Pokemon Shape", y = "Frequency", title = "Bar Plot of Pokemon Shapes") + scale_fill_brewer(palette = "Accent") +  guides(fill=guide_legend(title="Number of Types") ) + theme_classic()
 ```
 
-![](~/images/unnamed-chunk-26-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 Second, we can look at a histogram of pokemon weights. This seemed
 fitting since the majority of our previous analysis has been on weights.
@@ -438,7 +438,7 @@ g <- ggplot(data = pokedex, aes(x = weight))
 g + geom_histogram(binwidth = 50, fill = "#c2add7") + labs(x = "Pokemon Weight", y = "Frequency", title = "Histogram of Pokemon Weights") + theme_classic()
 ```
 
-![](~/images/unnamed-chunk-27-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 Now let’s get a little more complicated. Let’s look at a scatterplot of
 weight vs. height. You can see below that there is a positive linear
@@ -459,7 +459,7 @@ g <- ggplot(pokedex, aes(x = weight, y = height))
 g + geom_point(aes(color = shape))  + labs(x = "Pokemon Weight", y = "Pokemon Height", title = "Scatterplot of Pokemon Weights vs Heights")  +  guides(color=guide_legend(title="Shape")) + theme_classic() 
 ```
 
-![](~/images/unnamed-chunk-28-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 Diving a little bit deeper, we can analyze some boxplots. The first
 boxplot is for weights, split up by pokemon shape. This shows the range
@@ -474,7 +474,7 @@ g <- ggplot(pokedex, aes(x = shape, y = weight))
 g + geom_boxplot(fill = "white") + geom_jitter(aes(group = shape, col = shape)) + labs(title = "Boxplot for Weight for Each Shape") + theme_classic() 
 ```
 
-![](~/images/unnamed-chunk-29-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 Finally, we can look at boxplots for height versus size. Since the size
 variable was created based on weight, it is expected that this plot will
@@ -489,7 +489,7 @@ g <- ggplot(pokedex, aes(x = size, y = height))
 g + geom_boxplot(fill = "white") + geom_jitter(aes(group = size, col = size)) + labs(title = "Boxplot for Height for Each Shape") + theme_classic() 
 ```
 
-![](~/images/unnamed-chunk-30-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 As a final comment, it has appeared that the larger pokemon have a lot
 in common, and the contrary is true for the smaller pokemon, as there is
