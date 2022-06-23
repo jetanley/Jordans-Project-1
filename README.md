@@ -251,20 +251,37 @@ pokedex
     ##  9 wartortle              142     10    225     1 blue   upright  
     ## 10 beedrill               178     10    295     2 yellow bug-wings
 
-For further analysis, lets create a new variable based on the existing
+For further analysis, let’s create a new variable based on the existing
 variables. I am interested in examining how weight classes effect their
 shapes, number of types, and other areas. With this in mind, lets create
 a `size` variable that classifies `weight` into bins of “Small”,
 “Medium”, or “Large”. Because of the range of weight values, I used a
-wider range of values for “Medium” than for the other two bins. First,
-lets
+wider range of values for “Medium” than for the other two bins.
+
+-   First, let’s create a cutoff. This is done by finding the range of
+    values (i.e. Maximum - minimum), and then dividing by 4. I divided
+    by 4 because I want to make the “Medium” range larger than the other
+    bins, as stated above.  
+-   Next, we can create the new variable, `size`. I used the `ifelse()`
+    function because a vectorized `if` is needed to capture all of the
+    options for each row in the dataset.
+    -   The “Small” category spans from the minimum value of `weight` to
+        the first quartile.  
+    -   The “Medium” bin spans from the first quartile to the third
+        quartile of `weight` values.  
+    -   The “Large” category spans from the third quartile to the
+        maximum value of `weight`.  
+-   Finally, we can print the pokedex tibble we saved the new variable
+    to and see our creation.
 
 ``` r
+# create a cutoff by dividing the weight range by 4
 cutoff <- (max(pokedex$weight) - min(pokedex$weight))/4
 
+# use the cutoff to make bins based on weight
 pokedex$size <- ifelse(pokedex$weight < cutoff, "Small", 
-                  ifelse(pokedex$weight < 2*cutoff, "Medium", 
-                    ifelse(pokedex$weight >= 3*cutoff,  "Large",  NA)))
+                  ifelse(pokedex$weight < 3*cutoff, "Medium", "Large"))
+                    
 
 pokedex
 ```
@@ -285,9 +302,13 @@ pokedex
 
 ## Tables
 
-You should create some contingency tables
+Now, let’s create some contingency tables to futher explore this data.
+First, we can see some one-way tables listing the distribution of colors
+and shapes. It appears that the most common color is blue and the most
+common shape is upright for these 10 pokemon.
 
 ``` r
+# one-way freq tables for color and shape
 table(pokedex$color)
 ```
 
@@ -303,7 +324,15 @@ table(pokedex$shape)
     ##     armor bug-wings quadruped   upright     wings 
     ##         1         2         2         4         1
 
+Next, we can examine some two-way contingency tables. Comparing color
+vs. shape, we can see that all 3 of the blue pokemon are upright in
+shape. Also, both of the green pokemon are quadruped. Similarly, we can
+look at our new variable, size, vs. shape. Ths tells us that all of the
+bug-wings shaped pokemon are medium in size, and the upright shaped
+pokemon can range greatly in size.
+
 ``` r
+# contingency tables for color vs. shape and size vs. shape
 table(pokedex$color, pokedex$shape)
 ```
 
@@ -328,10 +357,19 @@ table(pokedex$size, pokedex$shape)
 
 ## Numerical Summaries
 
-You should create numerical summaries for some quantitative variables at
-each setting of some of your categorical variables
+Let’s create numerical summaries for some quantitative variables at each
+setting of some of a categorical variable. Using piping from the `dplyr`
+package, we can group our values by color and examine a numerical
+summary of weight at each color level. We can see that the color blue
+has a very wide range of weights, with a minimum of 90 hectograms and a
+maximum of 855 hectograms. It is good to note that with the small size
+of this dataset, it is difficult to find meaningful observations when
+the data is split into so many groups. This is very visible when
+examining the variabce column. Many shape bins only have one
+observation, leading there to be no variance.
 
 ``` r
+# group data by color. Then summarize to get min, max, median, mean, and variance of weight
 pokedex %>% group_by(color) %>%
   summarize(min = min(weight), avg = mean(weight), med = median(weight), max = max(weight), var = var(weight))
 ```
@@ -346,7 +384,12 @@ pokedex %>% group_by(color) %>%
     ## 5 white    320  320   320    320     NA 
     ## 6 yellow   295  295   295    295     NA
 
+Similarly, we can group by shape and examine the weights of the pokemon
+in each class. We can see that quadrupeds and uprights have wide ranges
+in weight, both spanning just shy of 900 hectograms.
+
 ``` r
+# group data by shape. Then summarize to get min, max, median, mean, and variance of weight
 pokedex %>% group_by(shape) %>%
   summarize(min = min(weight), avg = mean(weight), med = median(weight), max = max(weight), var = var(weight))
 ```
@@ -362,47 +405,100 @@ pokedex %>% group_by(shape) %>%
 
 ## Graphical Summaries
 
-You should create at least five plots utilizing coloring, grouping, etc.
-All plots should have nice labels and titles.
+Now that we’ve got some general understanding of our data, lets
+visualize some of those observations we made earlier.
 
-You should have at least one bar plot, one histogram, one box plot, and
-one scatter plot
+Fisrt up is a bar chart of the frequencies of each of the pokemon
+shapes. As seen earlier in the frequency table above, upright is the
+most common pokemon shape. In addition to the frequency of shapes, this
+plot also shows the frequency of total number of types that each pokemon
+has by shape. An interesting observation is that all four of the upright
+pokemon each are classified as two pokemon types. I wonder if this is
+the same for all upright pokemon or if it’s a mere coincidence for the
+ones i chose for this demonstration?
 
 ``` r
+# set up plot with shape as x and color by type variable
 g <- ggplot(data = pokedex, aes(x = shape, fill = as.factor(types)))
+# add labels, change colors, and change label of the legend
 g + geom_bar()   + labs(x = "Pokemon Shape", y = "Frequency", title = "Bar Plot of Pokemon Shapes") + scale_fill_brewer(palette = "Accent") +  guides(fill=guide_legend(title="Number of Types") ) + theme_classic()
 ```
 
-![](~/images/unnamed-chunk-12-1.png)<!-- -->
+![](~/images/unnamed-chunk-26-1.png)<!-- -->
+
+Second, we can look at a histogram of pokemon weights. This seemed
+fitting since the majority of our previous analysis has been on weights.
+Interestingly, it appears that the most common weight is around 250
+hectograms, and we have a wide range from roughly 50 to 1000 hectograms.
 
 ``` r
+# set up plot base with weight on x axis
 g <- ggplot(data = pokedex, aes(x = weight))
+# put a histogram on the plot with purple color, add labels and change theme to classic
 g + geom_histogram(binwidth = 50, fill = "#c2add7") + labs(x = "Pokemon Weight", y = "Frequency", title = "Histogram of Pokemon Weights") + theme_classic()
 ```
 
-![](~/images/unnamed-chunk-13-1.png)<!-- -->
+![](~/images/unnamed-chunk-27-1.png)<!-- -->
+
+Now let’s get a little more complicated. Let’s look at a scatterplot of
+weight vs. height. You can see below that there is a positive linear
+trend between the two variables, as generally expected. As a pokemon’s
+weight gets larger, they also get taller. Adding another layer to this
+plot, we can see that the points are split up based on shape. Each color
+correpsonds to a different pokemon shape. One interesting thing to point
+out is the quadrupeds. There’s one green dot way down in the small size
+valeus and another in the large areas. This was expected after all of
+our previous analyses, but had this plot been the first thing we looked
+at, we would’ve wanted to look into those points further, and maybe even
+suspected an outlier.
 
 ``` r
+# set up base plot with weight on x-axis and height on y-axis
 g <- ggplot(pokedex, aes(x = weight, y = height))
-g + geom_point(aes(color = shape))  + labs(x = "Pokemon Weight", y = "Pokemon Height", title = "Scatterplot of Pokemon Weights vs Heights") + scale_color_brewer(palette = "Accent") +  guides(color=guide_legend(title="Shape")) + theme_classic() 
+# scatterplot bolor the dots by shape, add labels. Change legend title
+g + geom_point(aes(color = shape))  + labs(x = "Pokemon Weight", y = "Pokemon Height", title = "Scatterplot of Pokemon Weights vs Heights")  +  guides(color=guide_legend(title="Shape")) + theme_classic() 
 ```
 
-![](~/images/unnamed-chunk-14-1.png)<!-- -->
+![](~/images/unnamed-chunk-28-1.png)<!-- -->
+
+Diving a little bit deeper, we can analyze some boxplots. The first
+boxplot is for weights, split up by pokemon shape. This shows the range
+in weight for quadrupeds very dramatically. This plot also shows an
+outlier for the upright shaped pokemon. I will chalk this up to being
+due to the small size of this dataset, but it is worth mentioning.
 
 ``` r
 # set up plot
 g <- ggplot(pokedex, aes(x = shape, y = weight))
 # white boxplots with scatterplot over them, scatter is grouped and colored by shape 
-g + geom_boxplot(fill = "white") + geom_jitter(aes(group = shape, col = shape)) + labs(title = "Boxplot for Weight for Each Shape") + theme_classic() + scale_color_brewer(palette = "Accent")
+g + geom_boxplot(fill = "white") + geom_jitter(aes(group = shape, col = shape)) + labs(title = "Boxplot for Weight for Each Shape") + theme_classic() 
 ```
 
-![](~/images/unnamed-chunk-15-1.png)<!-- -->
+![](~/images/unnamed-chunk-29-1.png)<!-- -->
+
+Finally, we can look at boxplots for height versus size. Since the size
+variable was created based on weight, it is expected that this plot will
+be similar to the scatterplot for weight vs. height above. And, as
+expected, large sized pokemon tend to be taller. The small and medium
+categories overlapp a bit in height, which is more interesting.
 
 ``` r
 # set up plot
-g <- ggplot(pokedex, aes(x = size, y = weight))
+g <- ggplot(pokedex, aes(x = size, y = height))
 # white boxplots with scatterplot over them, scatter is grouped and colored by size 
-g + geom_boxplot(fill = "white") + geom_jitter(aes(group = size, col = size)) + labs(title = "Boxplot for Weight for Each Shape") + theme_classic() + scale_color_brewer(palette = "Accent")
+g + geom_boxplot(fill = "white") + geom_jitter(aes(group = size, col = size)) + labs(title = "Boxplot for Height for Each Shape") + theme_classic() 
 ```
 
-![](~/images/unnamed-chunk-16-1.png)<!-- -->
+![](~/images/unnamed-chunk-30-1.png)<!-- -->
+
+As a final comment, it has appeared that the larger pokemon have a lot
+in common, and the contrary is true for the smaller pokemon, as there is
+a lot more variety among the littler guys. Gathering a larger set of
+data from the API could help refute or justify this claim, but that
+requires more time and coding.
+
+# Wrap up
+
+Overall, APIs are great sources to use for data collection. They can be
+a tad confusing, but with practice and lots of useful functions, you too
+can create datasets, summaries, and plots with data pulled from APIs!
